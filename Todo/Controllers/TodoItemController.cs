@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Todo.Data;
 using Todo.Data.Entities;
@@ -22,8 +23,7 @@ namespace Todo.Controllers
         [HttpGet]
         public IActionResult Create(int todoListId)
         {
-            var todoList = dbContext.SingleTodoList(todoListId);
-            var fields = TodoItemCreateFieldsFactory.Create(todoList, User.Id());
+            var fields = CreateTodoItemCreateFieldsViewModel(todoListId);
             return View(fields);
         }
 
@@ -33,10 +33,7 @@ namespace Todo.Controllers
         {
             if (!ModelState.IsValid) { return View(fields); }
 
-            var item = new TodoItem(fields.TodoListId, fields.ResponsiblePartyId, fields.Title, fields.Importance);
-
-            await dbContext.AddAsync(item);
-            await dbContext.SaveChangesAsync();
+            await PersistTodoItem(fields);
 
             return RedirectToListDetail(fields.TodoListId);
         }
@@ -65,9 +62,41 @@ namespace Todo.Controllers
             return RedirectToListDetail(todoItem.TodoListId);
         }
 
+        [HttpGet]
+        public IActionResult RenderCreateFieldsPartial(int todoListId)
+        {
+            var fields = CreateTodoItemCreateFieldsViewModel(todoListId);
+            return PartialView("_CreateFieldsPartial", fields);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> HandleCreateForm(TodoItemCreateFields fields)
+        {
+            if (!ModelState.IsValid) { return PartialView("_CreateFieldsPartial", fields); }
+
+            await PersistTodoItem(fields);
+
+            return StatusCode(StatusCodes.Status201Created);
+        }
+
         private RedirectToActionResult RedirectToListDetail(int fieldsTodoListId)
         {
             return RedirectToAction("Detail", "TodoList", new {todoListId = fieldsTodoListId});
+        }
+
+        private TodoItemCreateFields CreateTodoItemCreateFieldsViewModel(int todoListId)
+        {
+            var todoList = dbContext.SingleTodoList(todoListId);
+            return TodoItemCreateFieldsFactory.Create(todoList, User.Id());
+        }
+
+        private async Task PersistTodoItem(TodoItemCreateFields fields)
+        {
+            var item = new TodoItem(fields.TodoListId, fields.ResponsiblePartyId, fields.Title, fields.Importance);
+
+            await dbContext.AddAsync(item);
+            await dbContext.SaveChangesAsync();
         }
     }
 }

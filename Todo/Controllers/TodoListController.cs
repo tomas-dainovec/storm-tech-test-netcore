@@ -33,9 +33,14 @@ namespace Todo.Controllers
 
         public IActionResult Detail(int todoListId, bool? hideCompletedItems = null, string orderBy = null)
         {
-            var todoList = dbContext.SingleTodoList(todoListId);
-            var viewmodel = TodoListDetailViewmodelFactory.Create(todoList, hideCompletedItems, orderBy);
+            var viewmodel = CreateDetailsViewModel(todoListId, hideCompletedItems, orderBy);
             return View(viewmodel);
+        }
+
+        public IActionResult RenderListItems(int todoListId, bool? hideCompletedItems = null, string orderBy = null)
+        {
+            var viewmodel = CreateDetailsViewModel(todoListId, hideCompletedItems, orderBy);
+            return PartialView("_ListItemsPartial", viewmodel);
         }
 
         [HttpGet]
@@ -58,6 +63,12 @@ namespace Todo.Controllers
             await dbContext.SaveChangesAsync();
 
             return RedirectToAction("Create", "TodoItem", new {todoList.TodoListId});
+        }
+
+        private TodoListDetailViewmodel CreateDetailsViewModel(int todoListId, bool? hideCompletedItems = null, string orderBy = null)
+        {
+            var todoList = dbContext.SingleTodoList(todoListId);
+            return TodoListDetailViewmodelFactory.Create(todoList, hideCompletedItems, orderBy);
         }
     }
 }

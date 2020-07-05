@@ -1,0 +1,37 @@
+﻿@using Todo.Data
+@using Todo.Models.TodoItems
+@using Todo.Views.TodoItem
+
+@model TodoItemCreateFields
+
+@inject ApplicationDbContext dbContext
+
+@Html.AntiForgeryToken()
+
+@Html.HiddenFor(m => m.TodoListId)
+
+<div class="form-group">
+    <label asp-for="Title"></label>
+    <input asp-for="Title" class="form-control" />
+    <span asp-validation-for="Title" class="text-danger"></span>
+</div>
+
+<div class="form-group">
+    <label asp-for="Importance"></label>
+    @Html.DropDownListFor(
+        m => m.Importance,
+        SelectListConvenience.ImportanceSelectListItems,
+        new { @class = "form-control" }
+        )
+    <span asp-validation-for="Importance" class="text-danger"></span>
+</div>
+
+<div class="form-group">
+    <label asp-for="ResponsiblePartyId"></label>
+    @Html.DropDownListFor(
+        m => m.ResponsiblePartyId,
+        dbContext.UserSelectListItems(),
+        new { @class = "form-control" }
+        )
+    <span asp-validation-for="ResponsiblePartyId" class="text-danger"></span>
+</div>

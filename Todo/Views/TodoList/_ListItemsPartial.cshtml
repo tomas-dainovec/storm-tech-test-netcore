@@ -1,0 +1,51 @@
+﻿@using Todo.Data.Entities
+@using Todo.Services
+
+@model Todo.Models.TodoLists.TodoListDetailViewmodel
+
+@foreach (var item in Model.Items)
+{
+    string contextualClass;
+    switch (item.Importance)
+    {
+        case Importance.High:
+            contextualClass = "list-group-item-danger";
+            break;
+        case Importance.Low:
+            contextualClass = "list-group-item-info";
+            break;
+        default:
+            contextualClass = "";
+            break;
+    }
+
+    <li class="list-group-item @contextualClass">
+
+        <div class="row">
+
+            <div class="col-md-7">
+                <a asp-action="Edit" asp-controller="TodoItem" asp-route-todoItemId="@item.TodoItemId">
+
+                    @if (item.IsDone)
+                    {
+                        <s>@item.Title</s>
+                    }
+                    else
+                    {
+                        <text>@item.Title</text>
+                    }
+                </a>
+            </div>
+
+            <div class="col-md-5 text-right">
+                <small>
+
+                    <partial name="_UsernamePartial" model="@item.ResponsibleParty.UserName" />
+                    <img src="https://www.gravatar.com/avatar/@Gravatar.GetHash(item.ResponsibleParty.Email)?s=30" />
+
+                </small>
+            </div>
+        </div>
+
+    </li>
+}

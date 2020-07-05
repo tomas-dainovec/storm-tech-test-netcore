@@ -1,6 +1,5 @@
-﻿@using Todo.Controllers
-@using Todo.Data.Entities
-@using Todo.Services
+﻿@using Todo.Data.Entities
+
 @model Todo.Models.TodoLists.TodoListDetailViewmodel
 
 @{
@@ -42,59 +41,36 @@
         }
     </p>
 
-    <ul class="list-group">
+    <ul id="todoList" class="list-group">
 
         <li class="list-group-item">
-            <a asp-action="Create" asp-controller="TodoItem" asp-route-todoListId="@Model.TodoListId">
+
+            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#newItemModal" data-todo-list-id="@Model.TodoListId">
                 <strong>Add New Item</strong>
-            </a>
-        </li>
+            </button>
 
-        @foreach (var item in Model.Items)
-        {
-            string contextualClass;
-            switch (item.Importance)
-            {
-                case Importance.High:
-                    contextualClass = "list-group-item-danger";
-                    break;
-                case Importance.Low:
-                    contextualClass = "list-group-item-info";
-                    break;
-                default:
-                    contextualClass = "";
-                    break;
-            }
-
-            <li class="list-group-item @contextualClass">
-
-                <div class="row">
-
-                    <div class="col-md-7">
-                        <a asp-action="Edit" asp-controller="TodoItem" asp-route-todoItemId="@item.TodoItemId">
-
-                            @if (item.IsDone)
-                            {
-                                <s>@item.Title</s>
-                            }
-                            else
-                            {
-                                <text>@item.Title</text>
-                            }
-                        </a>
-                    </div>
-
-                    <div class="col-md-5 text-right">
-                        <small>
-                           
-                            <partial name="_UsernamePartial" model="@item.ResponsibleParty.UserName" />
-                            <img src="https://www.gravatar.com/avatar/@Gravatar.GetHash(item.ResponsibleParty.Email)?s=30" />
-
-                        </small>
+            <!-- Modal -->
+            <div class="modal fade" id="newItemModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">New Item in @Model.Title</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form id="newItemForm" asp-action="HandleCreateForm">
+                                @* Should have a spinner *@
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" form="newItemForm">Create</button>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </li>
 
-            </li>
-        }
+        <partial name="_ListItemsPartial" model="Model" />
     </ul>
 </div>
