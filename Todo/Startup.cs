@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Todo.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Todo.Services;
 
 namespace Todo
 {
@@ -41,6 +42,10 @@ namespace Todo
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddMemoryCache();
+            services.AddHttpClient<IGravatarClient, GravatarClient>();
+            services.AddScoped<IGravatarService, GravatarService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

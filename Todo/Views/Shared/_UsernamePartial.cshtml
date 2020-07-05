@@ -1,0 +1,17 @@
+﻿@using Todo.Services
+@* model is email addres s*@
+@model string
+
+@inject IGravatarService gravatarService
+
+@{
+    var gravatarProfile = await gravatarService.GetGravatarProfile(Model);
+    if (gravatarProfile?.Name?.Formatted != null)
+    {
+        <span>@Model [@gravatarProfile.Name.Formatted]</span>
+    }
+    else
+    {
+        <span>@Model</span>
+    }
+}

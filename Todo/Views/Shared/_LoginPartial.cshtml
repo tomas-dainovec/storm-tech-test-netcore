@@ -22,7 +22,7 @@
                     }
 
                     <img src="https://www.gravatar.com/avatar/@gravatarhash?s=30" />
-                    @UserManager.GetUserName(User)
+                    <partial name="_UsernamePartial" model="@UserManager.GetUserName(User)" />           
                 </a>
             </li>
             <li>
