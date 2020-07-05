@@ -11,13 +11,34 @@
 
 <div class="col-md-6">
     <p>
-        @if (!Model.HideCompletedItems)
+        @if (!Model.HideCompletedItems.HasValue || !Model.HideCompletedItems.Value)
         {
-            <a class="btn btn-default" asp-route-todoListId="@Model.TodoListId" asp-route-hideCompletedItems="true">Hide Completed Items</a>
+            <a class="btn btn-default" 
+               asp-route-todoListId="@Model.TodoListId"
+               asp-route-orderby="@Model.OrderBy" 
+               asp-route-hideCompletedItems="true">Hide Completed Items</a>
         }
         else
         {
-            <a class="btn btn-default" asp-route-todoListId="@Model.TodoListId" asp-route-hideCompletedItems="false">Show All Items</a>
+            <a class="btn btn-default"
+               asp-route-todoListId="@Model.TodoListId" 
+               asp-route-orderby="@Model.OrderBy" 
+               asp-route-hideCompletedItems="false">Show All Items</a>
+        }
+
+        @if (Model.OrderBy != nameof(TodoItem.Rank))
+        {
+            <a class="btn btn-default" 
+               asp-route-todoListId="@Model.TodoListId"
+               asp-route-hideCompletedItems="@Model.HideCompletedItems" 
+               asp-route-orderby="@nameof(TodoItem.Rank)">Order by Rank</a>
+        }
+        else
+        {
+            <a class="btn btn-default" 
+               asp-route-todoListId="@Model.TodoListId"
+               asp-route-hideCompletedItems="@Model.HideCompletedItems"
+               asp-route-orderby="@nameof(TodoItem.Importance)">Order by Importance</a>
         }
     </p>
 
@@ -29,7 +50,7 @@
             </a>
         </li>
 
-        @foreach (var item in Model.Items.OrderBy(i => i.Importance))
+        @foreach (var item in Model.Items)
         {
             string contextualClass;
             switch (item.Importance)
