@@ -1,7 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGeneration.Utils.Messaging;
 using Todo.Data;
 using Todo.Data.Entities;
 using Todo.EntityModelMappers.TodoItems;
@@ -78,6 +82,44 @@ namespace Todo.Controllers
             await PersistTodoItem(fields);
 
             return StatusCode(StatusCodes.Status201Created);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateRank(int todoListId, int todoItemId, int newRank)
+        {
+            var items = await dbContext.TodoItems
+                .Where(i => i.TodoListId == todoListId)
+                .OrderBy(i => i.Rank ?? int.MaxValue)
+                .ToListAsync();
+
+            var updatedItem = items.First(i => i.TodoItemId == todoItemId);
+
+            var updatedItemIndex = items.IndexOf(updatedItem);
+
+            updatedItem.Rank = newRank;
+
+            // Down
+            if (newRank - 1 > updatedItemIndex)
+            {
+                for (var i = updatedItemIndex + 1; i <= newRank - 1; i++)
+                {
+                    items[i].Rank = i;
+                }
+            }
+            // Up
+            else
+            {
+                for (var i = newRank - 1; i < updatedItemIndex; i++)
+                {
+                    items[i].Rank = i + 2;
+                }
+            }
+
+            dbContext.TodoItems.UpdateRange(items);
+
+            await dbContext.SaveChangesAsync();
+
+            return Ok();
         }
 
         private RedirectToActionResult RedirectToListDetail(int fieldsTodoListId)

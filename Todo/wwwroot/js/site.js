@@ -2,16 +2,27 @@
 // for details on configuring this project to bundle and minify static web assets.
 
 $(function () {
+    var $todoList = $('#todoList').sortable({
+        items: 'li:not(li:first)',
+        update: function (_, ui) {
+            var newIndex = ui.item.index();
+
+            $.post('/TodoItem/UpdateRank', {
+                todoListId: $todoList.data('todo-list-id'),
+                todoItemId: ui.item.data('todo-item-id'),
+                newRank: newIndex,
+            });
+        }
+    }); 
+
     var $newItemModal = $('#newItemModal')
         .on('shown.bs.modal', function (e) {
-            var todoListId = $(e.relatedTarget).data('todo-list-id');
+            var todoListId = $todoList.data('todo-list-id');
             $('.modal-body form', this).load('/TodoItem/RenderCreateFieldsPartial?todoListId=' + todoListId);
         })
         .on('hide.bs.modal', function () {
             $('.modal-body form', this).empty();
-        });
-
-    var $todoList = $('#todoList');
+        });    
 
     $('#newItemForm').submit(function () {
         var $this = $(this);
@@ -26,7 +37,7 @@ $(function () {
                         .siblings()
                         .remove();
 
-                    $todoList.append(listData);
+                    $todoList.append(listData).sortable('refresh');
                 });
             } else {
                 $this.html(data);

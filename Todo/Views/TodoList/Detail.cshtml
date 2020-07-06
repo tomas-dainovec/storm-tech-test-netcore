@@ -41,11 +41,11 @@
         }
     </p>
 
-    <ul id="todoList" class="list-group">
+    <ul id="todoList" class="list-group" data-todo-list-id="@Model.TodoListId">
 
         <li class="list-group-item">
 
-            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#newItemModal" data-todo-list-id="@Model.TodoListId">
+            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#newItemModal">
                 <strong>Add New Item</strong>
             </button>
 
